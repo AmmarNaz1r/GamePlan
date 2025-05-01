@@ -1,6 +1,7 @@
+CREATE DATABASE IF NOT EXISTS bettys_books;
 
 # Create the app user
-CREATE USER IF NOT EXISTS 'appuser'@'localhost' IDENTIFIED BY 'qwertyuiop'; 
+CREATE USER IF NOT EXISTS 'appuser'@'localhost' IDENTIFIED BY 'app2027'; 
 GRANT ALL PRIVILEGES ON bettys_books.* TO ' appuser'@'localhost';
 # Insert data into the tables
 
