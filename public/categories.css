@@ -1,0 +1,261 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f6f6f6;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .category-card {
+    padding: 1rem;
+    border-radius: 12px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+    min-height: 120px;
+  }
+  
+  .category-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .edit-btn, .delete-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .edit-btn:hover, .delete-btn:hover {
+    background: rgba(255,255,255,0.35);
+  }
+  
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .pagination-controls button {
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .pagination-controls button:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+  
+  .add-category-form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .add-category-form input[type="text"] {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 200px;
+  }
+  
+  .add-category-form input[type="color"] {
+    width: 50px;
+    height: 40px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .add-category-form button {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .add-category-form button:hover {
+    background: #218838;
+  }
+  
+
+
+.category-card {
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+    min-height: 120px;
+    background-color: var(--category-color);
+    color: white;
+}
+
+/* Specifically target pure white backgrounds */
+.category-card[data-bg="#ffffff"],
+.category-card[style*="background-color: #ffffff"] {
+    color: black;
+}
+
+.edit-btn, .delete-btn {
+    background: inherit; /* Inherit background color from the category card */
+    color: inherit; /* Inherit text color */
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* Ensure proper contrast for white backgrounds */
+.category-card[style*="background-color: #ffffff"] .edit-btn,
+.category-card[style*="background-color: #ffffff"] .delete-btn {
+    color: black;
+    background: rgba(0, 0, 0, 0.1); /* Slight gray for contrast */
+}
+
+/* Hover effect for better visibility */
+.edit-btn:hover, .delete-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Modal Overlay */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000; /* Ensures modal is on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    backdrop-filter: blur(5px); /* Optional: Adds blur effect behind modal */
+    padding: 20px; /* Prevents the modal from touching the edges */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 25px;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    transition: all 0.3s ease-in-out; /* Smooth transition */
+  }
+  
+  /* Close Button */
+  .close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    float: right;
+    cursor: pointer;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Add padding and space between elements */
+  .modal-content h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Form Styling */
+  .modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .modal-content input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .modal-content button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .modal-content button:hover {
+    background-color: #0056b3;
+  }
+  
+
+  .back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-button:hover {
+    background-color: #5a6268;
+  }
+  
+
+  /* Apply text color change to all elements when background is #ffffff */
+*[style*="background-color: #ffffff"] {
+    color: black !important;
+}

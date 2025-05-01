@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team Selection</title>
+    <link rel="stylesheet" type="text/css" href="/team.css">
+</head>
+<body>
+
+    <div class="group-container">
+        <div class="team-container">
+            <h1>Select Your Team</h1>
+            <form action="/api/select-team" method="POST">
+                <div class="team-options">
+                    <!-- AFC Bournemouth -->
+                    <button type="button" class="team-card" data-value="47">
+                        <img src="/images/afc-bournemouth.png" alt="AFC Bournemouth">
+                        <p>AFC Bournemouth</p>
+                    </button>
+    
+                    <!-- Arsenal -->
+                    <button type="button" class="team-card" data-value="1">
+                        <img src="/images/arsenal.png" alt="Arsenal">
+                        <p>Arsenal</p>
+                    </button>
+    
+                    <!-- Aston Villa -->
+                    <button type="button" class="team-card" data-value="2">
+                        <img src="/images/aston-villa.png" alt="Aston Villa">
+                        <p>Aston Villa</p>
+                    </button>
+    
+                    <!-- Brentford -->
+                    <button type="button" class="team-card" data-value="49">
+                        <img src="/images/brentford.png" alt="Brentford">
+                        <p>Brentford</p>
+                    </button>
+    
+                    <!-- Brighton & Hove Albion -->
+                    <button type="button" class="team-card" data-value="21">
+                        <img src="/images/brighton.png" alt="Brighton & Hove Albion">
+                        <p>Brighton & Hove Albion</p>
+                    </button>
+    
+                    <!-- Chelsea -->
+                    <button type="button" class="team-card" data-value="7">
+                        <img src="/images/chelsea.png" alt="Chelsea">
+                        <p>Chelsea</p>
+                    </button>
+    
+                    <!-- Crystal Palace -->
+                    <button type="button" class="team-card" data-value="8">
+                        <img src="/images/crystal-palace.png" alt="Crystal Palace">
+                        <p>Crystal Palace</p>
+                    </button>
+    
+                    <!-- Everton -->
+                    <button type="button" class="team-card" data-value="9">
+                        <img src="/images/everton.png" alt="Everton">
+                        <p>Everton</p>
+                    </button>
+    
+                    <!-- Fulham -->
+                    <button type="button" class="team-card" data-value="10">
+                        <img src="/images/fulham.png" alt="Fulham">
+                        <p>Fulham</p>
+                    </button>
+    
+                    <!-- Ipswich Town -->
+                    <button type="button" class="team-card" data-value="28">
+                        <img src="/images/ipswich-town.png" alt="Ipswich Town">
+                        <p>Ipswich Town</p>
+                    </button>
+    
+                    <!-- Leicester City -->
+                    <button type="button" class="team-card" data-value="30">
+                        <img src="/images/leicester-city.png" alt="Leicester City">
+                        <p>Leicester City</p>
+                    </button>
+    
+                    <!-- Liverpool -->
+                    <button type="button" class="team-card" data-value="11">
+                        <img src="/images/liverpool.png" alt="Liverpool">
+                        <p>Liverpool</p>
+                    </button>
+    
+                    <!-- Manchester City -->
+                    <button type="button" class="team-card" data-value="12">
+                        <img src="/images/manchester-city.png" alt="Manchester City">
+                        <p>Manchester City</p>
+                    </button>
+    
+                    <!-- Manchester United -->
+                    <button type="button" class="team-card" data-value="13">
+                        <img src="/images/manchester-united.png" alt="Manchester United">
+                        <p>Manchester United</p>
+                    </button>
+    
+                    <!-- Newcastle United -->
+                    <button type="button" class="team-card" data-value="15">
+                        <img src="/images/newcastle-united.png" alt="Newcastle United">
+                        <p>Newcastle United</p>
+                    </button>
+    
+                    <!-- Nottingham Forest -->
+                    <button type="button" class="team-card" data-value="32">
+                        <img src="/images/nottingham-forest.png" alt="Nottingham Forest">
+                        <p>Nottingham Forest</p>
+                    </button>
+    
+                    <!-- Southampton -->
+                    <button type="button" class="team-card" data-value="18">
+                        <img src="/images/southampton.png" alt="Southampton">
+                        <p>Southampton</p>
+                    </button>
+    
+                    <!-- Tottenham Hotspur -->
+                    <button type="button" class="team-card" data-value="19">
+                        <img src="/images/tottenham-hotspur.png" alt="Tottenham Hotspur">
+                        <p>Tottenham Hotspur</p>
+                    </button>
+    
+                    <!-- West Ham United -->
+                    <button type="button" class="team-card" data-value="42">
+                        <img src="/images/west-ham-united.png" alt="West Ham United">
+                        <p>West Ham United</p>
+                    </button>
+    
+                    <!-- Wolverhampton Wanderers -->
+                    <button type="button" class="team-card" data-value="44">
+                        <img src="/images/wolverhampton-wanderers.png" alt="Wolverhampton Wanderers">
+                        <p>Wolverhampton Wanderers</p>
+                    </button>
+                </div>
+                
+                <input type="hidden" name="teamID" id="selected-team">
+                <button type="submit" class="confirm-button" disabled>Confirm Selection</button>
+            </form>
+        </div>
+    </div>
+    
+
+<script>
+    document.querySelectorAll('.team-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.team-card').forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('selected-team').value = this.getAttribute('data-value');
+            document.querySelector('.confirm-button').disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>

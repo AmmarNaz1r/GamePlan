@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Calendar</title>
+  <link rel="stylesheet" href="/calendar.css">
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="sidebar">
+
+      <h2>Categories</h2>
+
+      <a href="/api/categories" title="Manage Categories" class="manage-categories-link">
+        <i class="fa fa-cog"></i> Manage
+      </a>
+      <ul class="category-list">
+        <% categories.forEach(category => { %>
+          <li style="background-color: <%= category.color %>; padding: 8px; border-radius: 6px; margin-bottom: 5px;">
+            <%= category.name %>
+          </li>
+        <% }) %>
+      </ul>
+      <div id="nextReminder">
+        <h3 id="nextReminderTitle">Next Reminder: </h3>
+        <p id="timer">00d 00h 00m 00s</p>
+    </div>
+
+    </div>
+
+    <div class="calendar-container">
+      
+  <div class="container">
+    <div class="month-header">
+      <div class="month-nav">
+        <a href="/api/calendar?year=<%= month === 0 ? year - 1 : year %>&month=<%= month === 0 ? 11 : month - 1 %>">
+          <button class="nav-btn">&lt;</button>
+        </a>
+        <h1><%= monthName %> <%= yearName %></h1>
+        <a href="/api/calendar?year=<%= currentYear %>&month=<%= currentMonth %>">
+          <button class="nav-btn">Today</button>
+        </a>
+        <a href="/api/calendar?year=<%= month === 11 ? year + 1 : year %>&month=<%= month === 11 ? 0 : month + 1 %>">
+          <button class="nav-btn">&gt;</button>
+        </a>
+      </div>
+    </div>
+
+    <div class="days">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+
+    <div class="row">
+      <% daysArray.forEach((day, index) => { %>
+        <% if (index % 7 === 0 && index !== 0) { %>
+          </div><div class="row">
+        <% } %>
+        <% if (day !== null) { %>
+          <div class="box <%= currentDay === day && currentYear === year && currentMonth === month ? 'highlight' : '' %>" data-day="<%= day %>">
+            <div class="day-top">
+              <span><%= day %></span>
+              <button class="add-reminder-btn" data-day="<%= day %>">+</button>
+            </div>
+            
+            <% 
+              const formattedDate = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+              const dayReminders = reminders.filter(r => r.date === formattedDate);
+            %>
+            <% if (dayReminders.length > 0) { %>
+              <div class="reminders">
+                <% dayReminders.slice(0,2).forEach(reminder => { %>
+                  <div class="reminder-item" 
+                  data-id="<%= reminder.reminderID %>" 
+                  data-title="<%= reminder.title %>" 
+                  data-date="<%= reminder.date %>"
+                  data-time="<%= reminder.time %>" 
+                  data-userid="<%= reminder.userID %>" 
+                  data-description="<%= reminder.description %>"
+                  data-categoryid="<%= reminder.categoryId%>"
+                  style="background-color: <%= reminder.color %>;">
+                  <span class="reminder-title"><%= reminder.title %></span>
+                  <span class="reminder-time"><%= reminder.time %></span>
+                 </div>
+              
+                <% }); %>
+                <% if (dayReminders.length > 2) { %>
+                  <div class="reminder more-reminders" data-date="<%= formattedDate %>">+<%= dayReminders.length - 2  %> more</div>
+                <% } %>
+              </div>
+            <% } %>
+          </div>
+        <% } else { %>
+          <div class="box empty"></div>
+        <% } %>
+      <% }); %>
+    </div>
+  </div>
+
+  <script>
+    const allReminders = <%- JSON.stringify(reminders) %>;
+  </script>
+  
+  <script>
+    function formatTimeDifference(diffInMillis) {
+        const seconds = Math.ceil(diffInMillis / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        return {
+            days: days,
+            hours: hours % 24,
+            minutes: minutes % 60,
+            seconds: seconds % 60
+        };
+    }
+    
+    function updateTimer(reminders) {
+        const now = new Date();
+    
+        const remindersWithFullTime = reminders.map(r => {
+            const [day, month, year] = r.date.split('/');
+            const isoDate = `${year}-${month}-${day}`;
+            const fullTime = new Date(`${isoDate}T${r.time}`);
+            return { ...r, fullTime };
+        });
+    
+        remindersWithFullTime.sort((a, b) => a.fullTime - b.fullTime);
+        const nextReminder = remindersWithFullTime.find(r => r.fullTime > now);
+    
+        if (nextReminder) {
+            const diffInMillis = nextReminder.fullTime - now;
+            const timeRemaining = formatTimeDifference(diffInMillis);
+    
+            document.getElementById('timer').innerHTML =
+                `${timeRemaining.days}d ${timeRemaining.hours}h ${timeRemaining.minutes}m ${timeRemaining.seconds}s`;
+            document.getElementById('nextReminderTitle').innerHTML =
+                `Next Reminder: ${nextReminder.title}`;
+        }
+    }
+    
+    updateTimer(allReminders);
+    setInterval(() => updateTimer(allReminders), 1000);
+
+    </script>
+    
+
+  <!-- Add Reminder Modal -->
+<div id="addReminderModal" class="modal" style="display: none;">
+  <div class="modal-content modal-content-large polished-modal">
+    <span id="closeAddReminderModalBtn" class="close">&times;</span>
+    <h2 class="modal-title">Add Reminder</h2>
+
+    <label for="addReminderTitle" class="modal-label">Title</label>
+    <input type="text" id="addReminderTitle" class="modal-input" placeholder="Title"><br>
+
+    <label for="addReminderDescription" class="modal-label">Description</label>
+    <textarea id="addReminderDescription" class="modal-textarea" placeholder="Add more details..."></textarea>
+
+
+    <label for="addReminderTime" class="modal-label">Time</label>
+    <div class="time-input-wrapper">
+      <i class="fa fa-clock-o"></i>
+      <input type="time" id="addReminderTime" class="modal-time">
+    </div>
+
+    <label for="addReminderCategory" class="modal-label">Category</label>
+    <select id="addReminderCategory" class="modal-input">
+        <% categories.forEach(category => { %>
+            <option value="<%= category.id %>" style="color: <%= category.color %>;">
+                <%= category.name %>
+            </option>
+        <% }) %>
+    </select>
+    
+    <input type="hidden" id="addReminderDate">
+
+    <button id="saveReminderBtn" class="save-btn">Add Reminder</button>
+  </div>
+</div>
+
+
+  <!-- Modal: View/Edit Single Reminder -->
+  <div id="singleReminderModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span id="closeSingleReminderModalBtn" class="close">&times;</span>
+      <h2 id="singleReminderTitle">Reminder Title</h2>
+      <p class="modal-title"><strong>Time:</strong> <span id="singleReminderTime"></span></p>
+      <p class="modal-title"><strong>Description:</strong> <span id="singleReminderDescription"></span></p>
+      <div class="modal-buttons">
+        <button id="editReminderBtn">Edit</button>
+        <button id="deleteReminderBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal: Edit Single Reminder -->
+
+<div id="editReminderModal" class="modal" style="display: none;">
+  <div class="modal-content modal-content-large polished-modal">
+    <span id="closeEditReminderModalBtn" class="close">&times;</span>
+    <h2 class="modal-title">Edit Reminder</h2>
+
+    <label for="editReminderTitle" class="modal-label">Title</label>
+    <input type="text" id="editReminderTitle" class="modal-input" placeholder="Title"><br>
+
+    <label for="editReminderDescription" class="modal-label">Description</label>
+    <textarea id="editReminderDescription" class="modal-textarea" placeholder="Edit details..."></textarea>
+
+    <label for="editReminderTime" class="modal-label">Time</label>
+    <div class="time-input-wrapper">
+      <i class="fa fa-clock-o"></i>
+      <input type="time" id="editReminderTime" class="modal-time">
+    </div>
+
+    <!-- Edit Reminder Category -->
+    <label for="editReminderCategory" class="modal-label">Category</label>
+    <select id="editReminderCategory" class="modal-input">
+      <% categories.forEach(category => { %>
+        <option value="<%= category.id %>" style="color: <%= category.color %>;">
+            <%= category.name %>
+        </option>
+    <% }) %>
+    </select>
+
+    <input type="hidden" id="editReminderDate">
+
+    <div class="modal-buttons">
+      <button id="saveEditReminderBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteReminderModal" class="modal" style="display: none;">
+  <div class="modal-content polished-modal modal-content-small">
+    <span id="closeDeleteReminderModalBtn" class="close">&times;</span>
+    <h2 class="modal-title">Delete Reminder?</h2>
+    <p>Are you sure you want to delete this reminder? This action cannot be undone.</p>
+    
+    <div class="modal-buttons">
+      <button id="confirmDeleteReminderBtn">Yes, Delete</button>
+      <button id="cancelDeleteReminderBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- Modal: View More Reminders -->
+  <div id="viewMoreModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span id="closeViewMoreModalBtn" class="close">&times;</span>
+      <h2>Reminders for <span id="viewMoreDate"></span></h2>
+      <div id="viewMoreList"></div>
+    </div>
+  </div>
+
+
+
+  <script>
+    const calendarMonth = <%= month %>;
+    const calendarYear = <%= year %>;
+  </script>
+
+
+  
+  
+  <script>
+    let currentReminderId = null;
+    const singleReminderModal = document.getElementById("singleReminderModal");
+    const singleReminderTitle = document.getElementById("singleReminderTitle");
+    const singleReminderTime = document.getElementById("singleReminderTime");
+    const singleReminderDescription = document.getElementById("singleReminderDescription")
+
+    const singleReminderUserID = document.getElementById("singleReminderUserID");
+    const closeBtn = document.getElementById("closeSingleReminderModalBtn");
+    
+    const addReminderModal = document.getElementById("addReminderModal");
+    const closeAddReminderModalBtn = document.getElementById("closeAddReminderModalBtn");
+    const saveReminderBtn = document.getElementById("saveReminderBtn");
+
+
+
+    const viewMoreModal = document.getElementById("viewMoreModal");
+    const closeViewMoreBtn = document.getElementById("closeViewMoreModalBtn");
+    const viewMoreDateText = document.getElementById("viewMoreDate");
+    const viewMoreList = document.getElementById("viewMoreList");
+    
+
+
+ 
+    const editReminderModal = document.getElementById("editReminderModal");
+const editBtn = document.getElementById("editReminderBtn");
+
+
+const deleteBtn = document.getElementById("deleteReminderBtn");
+const deleteReminderModal = document.getElementById("deleteReminderModal");
+const closeDeleteReminderModalBtn = document.getElementById("closeDeleteReminderModalBtn");
+const cancelDeleteReminderBtn = document.getElementById("cancelDeleteReminderBtn");
+
+    document.querySelectorAll(".box").forEach(box => {
+  box.addEventListener("click", (e) => {
+    if (box.classList.contains("empty")) return;
+
+    // Ignore clicks on nested elements like 'more-reminders' or 'reminder-item'
+    if (e.target.closest(".reminder-item") || e.target.closest(".more-reminders")) return;
+
+    const selectedDate = box.dataset.day;
+    const formattedDate = `${String(selectedDate).padStart(2, '0')}/${String( month + 1 ).padStart(2, '0')}/${year}`;
+
+
+    document.getElementById("addReminderDate").value = formattedDate;
+    addReminderModal.style.display = "block";
+  });
+});
+document.querySelectorAll(".add-reminder-btn").forEach(button => {
+  button.addEventListener("click", (e) => {
+    e.stopPropagation(); // prevent the box click from firing
+    const day = button.dataset.day;
+    const formattedDate = `${String(day).padStart(2, '0')}/${String(calendarMonth + 1).padStart(2, '0')}/${calendarYear}`;
+    
+    document.getElementById("addReminderDate").value = formattedDate;
+    addReminderModal.style.display = "block";
+  });
+});
+
+
+
+    
+    // Attach click events to each reminder box
+    document.querySelectorAll(".reminder-item").forEach(reminder => {
+      reminder.addEventListener("click", () => {
+        currentReminderId = reminder.dataset.id;
+        const title = reminder.dataset.title;
+        const time = reminder.dataset.time;
+        const description = reminder.dataset.description;
+
+
+        singleReminderTitle.innerText = title;
+        singleReminderTime.innerText = time;
+        singleReminderDescription.innerText = description;
+        singleReminderModal.style.display = "block";
+      });
+    });
+
+    
+
+
+
+
+
+
+
+
+
+editBtn.addEventListener("click", () => {
+  const reminder = document.querySelector(`.reminder-item[data-id="${currentReminderId}"]`);
+  console.log("Found reminder element:", reminder);
+
+  if (reminder) {
+    const title = reminder.dataset.title;
+    const time = reminder.dataset.time;
+    const description = reminder.dataset.description || "";
+    const categoryId = reminder.dataset.categoryid;
+
+    // Set input fields
+    document.getElementById("editReminderTitle").value = title;
+    document.getElementById("editReminderTime").value = time;
+    document.getElementById("editReminderDescription").value = description;
+
+    // Select category
+    const categorySelect = document.getElementById("editReminderCategory");
+
+    // Print all option values
+    console.log("Available category options:");
+    Array.from(categorySelect.options).forEach(opt => {
+      console.log("Option value:", opt.value);
+    });
+
+    if (categorySelect && categoryId) {
+      categorySelect.value = categoryId;
+      console.log("Set select value to:", categorySelect.value);
+    } else {
+      console.warn("Could not set category - missing select or categoryId");
+    }
+  } else {
+    console.warn("Reminder element not found for ID:", currentReminderId);
+  }
+
+  editReminderModal.style.display = "block";
+  singleReminderModal.style.display = "none";
+});
+
+
+
+
+if (saveEditReminderBtn) {
+  saveEditReminderBtn.addEventListener("click", () => {
+    console.log("Editing reminder ID:", currentReminderId);
+
+  console.log("Save button clicked"); // <- test log
+
+  const updatedTitle = document.getElementById("editReminderTitle").value;
+  const updatedTime = document.getElementById("editReminderTime").value;
+  const updatedDescription = document.getElementById("editReminderDescription").value;
+  const updatedCategoryId = document.getElementById("editReminderCategory").value; 
+
+
+  console.log({ updatedTitle, updatedTime, updatedDescription,updatedCategoryId, currentReminderId });
+
+  fetch(`/api/edit-reminder/${currentReminderId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: updatedTitle,
+      time: updatedTime,
+      description: updatedDescription,
+      categoryId: updatedCategoryId
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Failed to update");
+    return res.json();
+  })
+  .then(() => location.reload())
+  .catch(err => console.error("Error editing reminder:", err));
+});
+}
+
+const closeEditReminderModalBtn = document.getElementById("closeEditReminderModalBtn");
+
+closeEditReminderModalBtn.addEventListener("click", () => {
+  editReminderModal.style.display = "none";
+});
+
+   
+
+    if (saveReminderBtn) {
+    saveReminderBtn.addEventListener("click", () => {
+      const title = document.getElementById("addReminderTitle").value;
+      const description = document.getElementById("addReminderDescription").value;
+      const time = document.getElementById("addReminderTime").value;
+      const date = document.getElementById("addReminderDate").value;
+      const categoryId = document.getElementById("addReminderCategory").value; 
+
+
+      fetch("/api/add-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description, time, date, categoryId })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to save");
+        return res.json();
+      })
+      .then(() => location.reload())
+      .catch(err => console.error("Error adding reminder:", err));
+    });
+  }
+
+  if (closeAddReminderModalBtn) {
+    closeAddReminderModalBtn.addEventListener("click", () => {
+      addReminderModal.style.display = "none";
+    });
+  }
+
+    // Close modal
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        singleReminderModal.style.display = "none";
+        currentReminderId = null;
+      });
+    }
+
+
+
+  deleteBtn.addEventListener("click", () => {
+  deleteReminderModal.style.display = "block";
+  singleReminderModal.style.display = "none"; 
+});
+
+closeDeleteReminderModalBtn.addEventListener("click", () => {
+  deleteReminderModal.style.display = "none";
+});
+
+cancelDeleteReminderBtn.addEventListener("click", () => {
+  deleteReminderModal.style.display = "none";
+});
+
+  document.querySelectorAll(".reminder-item").forEach(r => {
+  console.log("Reminder data:", r.dataset.date, r.dataset.title, r.dataset.time);
+});
+
+document.getElementById("confirmDeleteReminderBtn").addEventListener("click", () => {
+  fetch(`/api/delete-reminder/${currentReminderId}`, { method: "DELETE" })
+    .then(res => {
+      if (!res.ok) throw new Error("Delete failed");
+      return res.json();
+    })
+    .then(() => location.reload())
+    .catch(err => console.error("Delete error:", err));
+})
+
+
+// latest
+
+document.querySelectorAll(".more-reminders").forEach(button => {
+  button.addEventListener("click", (e) => {
+    const date = button.dataset.date;
+    viewMoreList.innerHTML = ''; // Clear previous reminders
+
+    const matchingReminders = allReminders.filter(r => r.date === date);
+
+    matchingReminders.forEach(reminder => {
+      const item = document.createElement("div");
+      item.classList.add("reminder-item");
+      item.dataset.id = reminder.reminderID;
+      item.dataset.title = reminder.title;
+      item.dataset.date = reminder.date;
+      item.dataset.time = reminder.time;
+      item.dataset.userid = reminder.userID;
+      item.dataset.description = reminder.description || '';
+      item.dataset.categoryid = reminder.categoryId;
+      item.style.backgroundColor = reminder.color;
+
+      item.innerHTML = `
+        <span class="reminder-title">${reminder.title}</span>
+        <span class="reminder-time">${reminder.time}</span>
+      `;
+
+      item.addEventListener("click", () => {
+        currentReminderId = item.dataset.id;
+
+        document.getElementById("singleReminderTitle").innerText = item.dataset.title;
+        document.getElementById("singleReminderTime").innerText = item.dataset.time;
+        document.getElementById("singleReminderDescription").innerText = item.dataset.description || "No description";
+
+        singleReminderModal.style.display = "block";
+        viewMoreModal.style.display = "none";
+      });
+
+      viewMoreList.appendChild(item);
+    });
+
+    viewMoreDateText.innerText = date;
+    viewMoreModal.style.display = "block";
+  });
+});
+
+
+
+
+
+// Close modal functionality
+closeViewMoreBtn.addEventListener("click", () => {
+    viewMoreModal.style.display = "none";
+});
+
+
+  </script>
+
+    </div>
+  </div>
+</body>
+
+</html>

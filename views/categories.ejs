@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manage Categories</title>
+  <link rel="stylesheet" href="/categories.css">
+</head>
+<body>
+
+  <div class="container">
+    <a href="/api/calendar" class="back-button">← Back to Calendar</a>
+
+    <h1>Manage Categories</h1>
+
+    <!-- Add Category Form -->
+    <form class="add-category-form" action="/api/add-category" method="POST">
+      <input type="text" name="categoryName" placeholder="Category Name" required>
+      <input type="color" name="categoryColor" value="#ff0000">
+      <button type="submit">Add Category</button>
+    </form>
+
+    <div class="grid-container" id="categoryGrid">
+      <% categories.slice(0, 16).forEach(category => { %>
+        <div class="category-card" style="background-color: <%= category.color %>;">
+          <span class="category-name"><%= category.name %></span>
+          <div class="card-actions">
+            <button class="edit-btn" onclick="openEditModal(<%= category.id %>, '<%= category.name %>', '<%= category.color %>')">Edit</button>
+            <button class="delete-btn" onclick="openDeleteModal(<%= category.id %>, '<%= category.name %>')">Delete</button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <% if (categories.length > 16) { %>
+      <div class="pagination-controls">
+        <button id="prevPage" disabled>Previous</button>
+        <button id="nextPage">Next</button>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Reusable Edit Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h3>Edit Category</h3>
+      <form id="editForm" method="POST">
+        <input type="text" name="categoryName" id="editName" required>
+        <input type="color" name="categoryColor" id="editColor">
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reusable Delete Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <h3>Delete Category</h3>
+      <p id="deleteText">Are you sure?</p>
+      <form id="deleteForm" method="POST">
+        <button type="submit">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const allCategories = <%- JSON.stringify(categories) %>;
+    let currentPage = 0;
+    const itemsPerPage = 16;
+
+    const categoryGrid = document.getElementById("categoryGrid");
+    const prevBtn = document.getElementById("prevPage");
+    const nextBtn = document.getElementById("nextPage");
+
+    function renderPage(page) {
+      const start = page * itemsPerPage;
+      const end = start + itemsPerPage;
+      const currentCategories = allCategories.slice(start, end);
+
+      categoryGrid.innerHTML = currentCategories.map(category => `
+        <div class="category-card" style="background-color: ${category.color};">
+          <span class="category-name">${category.name}</span>
+          <div class="card-actions">
+            <button class="edit-btn" onclick="openEditModal(${category.id}, '${category.name}', '${category.color}')">Edit</button>
+            <button class="delete-btn" onclick="openDeleteModal(${category.id}, '${category.name}')">Delete</button>
+          </div>
+        </div>
+      `).join("");
+
+      prevBtn.disabled = page === 0;
+      nextBtn.disabled = end >= allCategories.length;
+    }
+
+    if (prevBtn && nextBtn) {
+      prevBtn.addEventListener("click", () => {
+        if (currentPage > 0) {
+          currentPage--;
+          renderPage(currentPage);
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if ((currentPage + 1) * itemsPerPage < allCategories.length) {
+          currentPage++;
+          renderPage(currentPage);
+        }
+      });
+    }
+
+    renderPage(currentPage);
+  </script>
+
+  <script>
+    function openEditModal(id, name, color) {
+      document.getElementById("editName").value = name;
+      document.getElementById("editColor").value = color;
+      document.getElementById("editForm").action = `/api/edit-category/${id}`;
+      document.getElementById("editModal").style.display = "block";
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function openDeleteModal(id, name) {
+      document.getElementById("deleteText").textContent = `Are you sure you want to delete "${name}"?`;
+      document.getElementById("deleteForm").action = `/api/delete-category/${id}`;
+      document.getElementById("deleteModal").style.display = "block";
+    }
+
+    function closeDeleteModal() {
+      document.getElementById("deleteModal").style.display = "none";
+    }
+
+    window.addEventListener("click", (event) => {
+      document.querySelectorAll(".modal").forEach((modal) => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

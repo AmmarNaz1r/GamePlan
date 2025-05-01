@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GamePlan Admin</title>
+    <link rel="stylesheet" type="text/css" href="/main.css">
+</head>
+<body>
+
+<div class="group-container">
+    <div class="admin-container">
+        <h1>Admin Panel</h1>
+        
+        <div class="button-group">
+            <button onclick="window.location.href='/api/clear-data'">Clear Data</button>
+            <button onclick="window.location.href='/api/fetch-teams'">Update Teams</button>
+            <button onclick="window.location.href='/api/fetch-fixtures'">Update Fixtures</button>
+            <!-- <button onclick="window.location.href='/api/regenerateAllReminders'">Regenerate All Reminders</button> -->
+            <button onclick="window.location.href='/api/calendar'">Calendar</button>
+        </div>
+
+        <h2>Authentication</h2>
+        
+        <div class="button-group">
+            <button onclick="window.location.href='/api/login'">Login</button>
+            <button onclick="window.location.href='/api/register'">Register</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

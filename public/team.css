@@ -1,0 +1,110 @@
+/* General styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Center the content */
+.group-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* Team selection container */
+.team-container {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 800px; /* Adjusted to fit the grid */
+}
+
+/* Heading */
+h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Team selection area */
+.team-options {
+    display: grid; /* Changed to grid layout */
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    gap: 20px; /* Space between cards */
+    justify-items: center; /* Centers items within columns */
+}
+
+/* Team card button */
+.team-card {
+    background-color: #65ffdb;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px;
+    width: 140px;
+    height: 160px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Image inside button */
+.team-card img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Team name text */
+.team-card p {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Hover effect */
+.team-card:hover {
+    background-color: #49b89e;
+    transform: scale(1.05);
+}
+
+/* Selected team effect */
+.team-card.selected {
+    background-color: #ff9800;
+    transform: scale(1.08);
+}
+
+/* Confirm button */
+.confirm-button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #007b5e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.2s;
+}
+
+/* Disabled confirm button */
+.confirm-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Hover effect on confirm button */
+.confirm-button:not(:disabled):hover {
+    background-color: #005a43;
+}
